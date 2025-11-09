@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonymous Group Chat</title>
+    <style>
+        /* CSS কোড */
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .chat-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        #nickname-setup {
+            text-align: center;
+            padding-bottom: 20px;
+        }
+
+        #nickname-input {
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 60%;
+        }
+
+        #join-button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #join-button:hover {
+            background-color: #0056b3;
+        }
+
+        #chat-window {
+            display: none; /* শুরুতে লুকানো থাকবে */
+        }
+
+        #messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .message strong {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        #message-input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 80%;
+        }
+
+        #send-button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #send-button:hover {
+            background-color: #1e7e34;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div id="nickname-setup">
+            <h2>নিকনেম দিয়ে চ্যাট শুরু করুন 🚀</h2>
+            <input type="text" id="nickname-input" placeholder="আপনার নিকনেম লিখুন..." maxlength="20">
+            <button id="join-button">চ্যাটে যোগ দিন</button>
+        </div>
+
+        <div id="chat-window">
+            <h3>Anonymous Group Chat</h3>
+            <div id="messages">
+                </div>
+            <div class="input-area">
+                <input type="text" id="message-input" placeholder="আপনার মেসেজ লিখুন..." disabled>
+                <button id="send-button" disabled>পাঠান</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript কোড
+        let nickname = '';
+        const nicknameSetup = document.getElementById('nickname-setup');
+        const chatWindow = document.getElementById('chat-window');
+        const nicknameInput = document.getElementById('nickname-input');
+        const joinButton = document.getElementById('join-button');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const messagesContainer = document.getElementById('messages');
+
+        // চ্যাটে যোগ দিন বাটন ইভেন্ট লিসেনার
+        joinButton.addEventListener('click', () => {
+            const inputName = nicknameInput.value.trim();
+            if (inputName) {
+                nickname = inputName;
+                nicknameSetup.style.display = 'none';
+                chatWindow.style.display = 'block';
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+                messageInput.focus();
+                displaySystemMessage(`${nickname} চ্যাটে যোগ দিয়েছে।`);
+            } else {
+                alert('অনুগ্রহ করে একটি বৈধ নিকনেম দিন।');
+            }
+        });
+
+        // মেসেজ পাঠান ফাংশন (এই ফাংশনে ব্যাক-এন্ড লজিক যোগ করতে হবে)
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (messageText && nickname) {
+                // এটি শুধুমাত্র ফ্রন্ট-এন্ডে মেসেজ প্রদর্শন করবে
+                // রিয়েল-টাইম চ্যাটের জন্য আপনাকে এখানে একটি WebSocket বা Fetch API কল যোগ করতে হবে।
+                displayMessage(nickname, messageText);
+                messageInput.value = ''; // ইনপুট খালি করুন
+                messagesContainer.scrollTop = messagesContainer.scrollHeight; // স্ক্রল নিচে করুন
+            }
+        }
+
+        // মেসেজ প্রদর্শনের ফাংশন
+        function displayMessage(sender, text) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.innerHTML = `<strong>${sender}:</strong> ${text}`;
+            messagesContainer.appendChild(messageElement);
+        }
+
+        // সিস্টেম মেসেজ প্রদর্শনের ফাংশন (যেমন: 'অমুক যোগ দিয়েছে')
+        function displaySystemMessage(text) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.style.textAlign = 'center';
+            messageElement.style.fontStyle = 'italic';
+            messageElement.textContent = text;
+            messagesContainer.appendChild(messageElement);
+        }
+
+        // পাঠান বাটন ইভেন্ট লিসেনার
+        sendButton.addEventListener('click', sendMessage);
+
+        // এন্টার চাপলে মেসেজ পাঠানোর জন্য
+        messageInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
